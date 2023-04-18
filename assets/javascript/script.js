@@ -25,12 +25,3 @@ menuToggle.addEventListener('click', function () {
 		overlay.removeEventListener('click', function () {})
 	}
 })
-
-const swiper = new Swiper('.swiper', {
-	// Default parameters
-	slidesPerView: 4,
-	loop: true,
-	centeredSlides: true,
-	allowSlideNext: true,
-	allowSlidePrev: true,
-})
