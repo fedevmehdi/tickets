@@ -2,6 +2,9 @@
 :root {
 	--primary-color: #aa1894;
 	--primary-color-hover: #d23bbf;
+	--primary-typo-color: #333;
+	--primary-typo-color-hover: #000000;
+	--button-border-radius: 10px;
 }
 
 /* Reset default browser styles */
@@ -240,7 +243,7 @@ input[type='checkbox']:checked {
 
 /* Buttons */
 .btn {
-	border-radius: 10px;
+	border-radius: var(--button-border-radius);
 	font-size: 14px;
 	padding: 0.8rem 2rem;
 	text-decoration: none;
