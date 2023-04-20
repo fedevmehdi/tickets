@@ -24,4 +24,16 @@ menuToggle.addEventListener('click', function () {
 		// Remove click event listener from overlay
 		overlay.removeEventListener('click', function () {})
 	}
+	document.documentElement.classList.toggle('disable-scroll')
+})
+
+const btnDashboard = document.querySelector('.btn-dashboard')
+const dashboardMenuOverlay = document.querySelector('.dashboard-menu-overlay')
+const dashboardMenu = document.querySelector('.dashboard-menu')
+
+btnDashboard.addEventListener('click', function () {
+	btnDashboard.classList.toggle('open')
+	dashboardMenu.classList.toggle('open')
+	dashboardMenuOverlay.classList.toggle('visible')
+	document.documentElement.classList.toggle('disable-scroll')
 })
