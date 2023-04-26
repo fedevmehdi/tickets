@@ -292,3 +292,25 @@ input[type='checkbox']:checked {
 .disable-scroll {
 	overflow: hidden;
 }
+
+/* Dropdown menu */
+.dropdown-menu {
+	display: block;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.5s ease-in-out;
+	position: relative;
+}
+.dropdown-menu.open {
+	max-height: 200px; /* adjust as needed */
+}
+.dropdown-menu .vertical-line {
+	position: absolute;
+	width: 3px;
+	height: 100px; /* adjust as needed */
+	background-color: #575757;
+	top: 0;
+	left: 8px;
+	border-radius: 20px;
+	overflow: hidden;
+}

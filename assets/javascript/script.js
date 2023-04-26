@@ -1,3 +1,12 @@
+// Functions
+function toggleClass(element, className) {
+	if (element.classList.contains(className)) {
+		element.classList.remove(className)
+	} else {
+		element.classList.add(className)
+	}
+}
+
 // Get the menu toggle button
 const menuToggle = document.querySelector('.menu-toggle')
 
@@ -36,4 +45,16 @@ btnDashboard.addEventListener('click', function () {
 	dashboardMenu.classList.toggle('open')
 	dashboardMenuOverlay.classList.toggle('visible')
 	document.documentElement.classList.toggle('disable-scroll')
+})
+
+const dropdown = document.querySelector('.dropdown')
+const dropdownMenu = dropdown.querySelector('.dropdown-menu')
+const dropdownToggle = dropdown.querySelector('.nav-link')
+
+dropdownToggle.addEventListener('click', function (event) {
+	if (dropdownMenu.classList.contains('open')) {
+		dropdownMenu.classList.remove('open')
+	} else {
+		dropdownMenu.classList.add('open')
+	}
 })
