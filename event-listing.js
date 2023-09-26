@@ -12,12 +12,32 @@ function getCurrencySymbol(currencyCode) {
 	return currencySymbols[code] || currencyCode || ""
 }
 
+function isEventClosed(eventStartDateTime) {
+	// Convert the eventStartDateTime to a Date object
+	const eventTime = new Date(eventStartDateTime)
+
+	// Get the current date and time
+	const currentTime = new Date()
+
+	// Compare the two dates
+	if (eventTime < currentTime) {
+		return true
+	} else {
+		return false
+	}
+}
+
 // Function to fetch data from the API
 async function fetchTicketData(eventId) {
 	try {
 		const apiUrl = `https://wow.tickets/api/tickets/event/${eventId}`
 		const response = await fetch(apiUrl)
 		const data = await response.json()
+
+		if (isEventClosed(data[0].event.startDateTime)) {
+			return "Event is closed"
+		}
+
 		return data
 	} catch (error) {
 		console.error("Error fetching data:", error)
@@ -28,15 +48,27 @@ async function fetchTicketData(eventId) {
 // Function to populate the events div with ticket details
 async function populateEventsDiv() {
 	// Extract event ID from the div's id attribute
-	const divId = "event-listing-64f9f939cef9f4d4c9b18418" // Replace with actual ID
-	const eventId = divId.replace("event-listing-", "")
+	const eventId = document
+		.getElementById("wt-embed-event")
+		.getAttribute("data-event-id")
 
-	const eventsDiv = document.getElementById(divId)
+	const container = document.getElementById("wt-embed-event")
+	const eventsDiv = document.createElement("div")
+	eventsDiv.id = "wt-event-listing"
+	container.append(eventsDiv)
 
 	if (!eventsDiv) {
 		console.error("Events div not found.")
 		return
 	}
+
+	// Create additional elements
+	const footer = document.createElement("div")
+	footer.className = "wt-footer"
+	const checkoutButton = document.createElement("button")
+	checkoutButton.id = "wt-checkout-button"
+	checkoutButton.innerText = "Checkout Now"
+	footer.append(checkoutButton)
 
 	// Create an array to store selected ticket details
 	const selectedTickets = []
@@ -46,6 +78,16 @@ async function populateEventsDiv() {
 
 	if (!tickets) {
 		console.error("No ticket data found.")
+		return
+	}
+
+	if (tickets === "Event is closed") {
+		const messageBox = document.createElement("div")
+		messageBox.className = "message-box"
+		const message = document.createElement("p")
+		message.innerText = "Tickets are closed for this events."
+		messageBox.append(message)
+		eventsDiv.append(messageBox)
 		return
 	}
 
@@ -65,19 +107,21 @@ async function populateEventsDiv() {
 					// If currency is different, don't calculate total
 					return
 				}
-				totalAmount += selectedTicket.quantity * ticket.price
+				totalAmount +=
+					selectedTicket.quantity *
+					(ticket.price + (ticket.price / 100) * ticket.bookingFee)
 			}
 		})
 
 		// Update the button text to display the total amount with currency
-		const logButton = document.getElementById("log-button")
+		const logButton = document.getElementById("wt-checkout-button")
 		if (logButton) {
 			if (currency) {
-				logButton.textContent = `Checkout Now - ${totalAmount.toFixed(
+				logButton.textContent = `Checkout - ${totalAmount.toFixed(
 					2
 				)}${getCurrencySymbol(currency)}`
 			} else {
-				logButton.textContent = "Checkout Now"
+				logButton.textContent = "Checkout"
 			}
 		}
 	}
@@ -85,26 +129,26 @@ async function populateEventsDiv() {
 	// Iterate through the ticket data and create divs for each ticket
 	tickets.forEach(ticket => {
 		const ticketDiv = document.createElement("div")
-		ticketDiv.className = "ticket-details"
+		ticketDiv.className = "wt-ticket-details"
 
 		// Extract ticket details (name, description, price, currency) and populate the div
 		const ticketName = document.createElement("h3")
-		ticketName.className = "ticket-name"
+		ticketName.className = "wt-ticket-name"
 		ticketName.textContent = ticket.name
 
 		const ticketDescription = document.createElement("p")
-		ticketDescription.className = "ticket-description"
+		ticketDescription.className = "wt-ticket-description"
 		ticketDescription.textContent = ticket.description
 
 		const ticketPrice = document.createElement("p")
-		ticketPrice.className = "ticket-price"
-		ticketPrice.textContent = `Price: ${ticket.price} ${getCurrencySymbol(
-			ticket.currency
-		)}`
+		ticketPrice.className = "wt-ticket-price"
+		ticketPrice.textContent = `Price: ${
+			ticket.price + (ticket.price / 100) * ticket.bookingFee
+		} ${getCurrencySymbol(ticket.currency)}`
 
 		// Create a dropdown input for selecting quantity
 		const quantityDropdown = document.createElement("select")
-		quantityDropdown.className = "quantity-dropdown"
+		quantityDropdown.className = "wt-quantity-dropdown"
 		quantityDropdown.addEventListener("change", () => {
 			const quantity = parseInt(quantityDropdown.value, 10)
 			// Update the selectedTickets array with the selected quantity, ticketId, and currency
@@ -134,7 +178,7 @@ async function populateEventsDiv() {
 
 		const metaData = document.createElement("div")
 		const cartData = document.createElement("div")
-		cartData.className = "cart-data"
+		cartData.className = "wt-cart-data"
 
 		metaData.appendChild(ticketName)
 		metaData.appendChild(ticketDescription)
@@ -146,13 +190,27 @@ async function populateEventsDiv() {
 
 		// Append the ticket div to the events div
 		eventsDiv.appendChild(ticketDiv)
+		eventsDiv.append(footer)
 	})
 
+	function redirectToCheckout(selectedTickets) {
+		const checkoutUrl = "http://localhost:3000/process-checkout"
+
+		// Check if there are selected tickets and perform the redirect
+		if (selectedTickets.length > 0) {
+			const stringArray = JSON.stringify(selectedTickets)
+			// Open the checkout URL in a new tab or window with the query string
+			window.open(`${checkoutUrl}?cart=${stringArray}`, "_blank")
+		} else {
+			// If no tickets are selected, you can display an error message or take appropriate action
+			alert("Please select tickets before proceeding to checkout.")
+		}
+	}
+
 	// Add a click event listener to the log button (Checkout Now)
-	const logButton = document.getElementById("log-button")
+	const logButton = document.getElementById("wt-checkout-button")
 	logButton.addEventListener("click", () => {
-		console.log(selectedTickets)
-		// You can perform the checkout action here
+		redirectToCheckout(selectedTickets)
 	})
 }
 
