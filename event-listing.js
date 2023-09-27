@@ -51,10 +51,12 @@ async function populateEventsDiv() {
 	const eventId = document
 		.getElementById("wt-embed-event")
 		.getAttribute("data-event-id")
+	eventId.className = "wt-embed-event"
 
 	const container = document.getElementById("wt-embed-event")
 	const eventsDiv = document.createElement("div")
 	eventsDiv.id = "wt-event-listing"
+	eventsDiv.className = "wt-event-listing"
 	container.append(eventsDiv)
 
 	if (!eventsDiv) {
@@ -67,6 +69,7 @@ async function populateEventsDiv() {
 	footer.className = "wt-footer"
 	const checkoutButton = document.createElement("button")
 	checkoutButton.id = "wt-checkout-button"
+	checkoutButton.className = "wt-checkout-button"
 	checkoutButton.innerText = "Checkout Now"
 	footer.append(checkoutButton)
 
@@ -194,7 +197,7 @@ async function populateEventsDiv() {
 	})
 
 	function redirectToCheckout(selectedTickets) {
-		const checkoutUrl = "http://localhost:3000/process-checkout"
+		const checkoutUrl = "https://wow.tickets/process-checkout"
 
 		// Check if there are selected tickets and perform the redirect
 		if (selectedTickets.length > 0) {
